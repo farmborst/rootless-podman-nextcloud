@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# collection of commands useful for full or partial reinstall / uninstall
+
+# podman volume rm ncapp
+# podman volume rm ncdb
+# podman volume rm ncdata
+
+# podman pod stop PodNextcloud
+# podman pod rm PodNextcloud
+
+# podman container stop nextcloud
+# podman container rm nextcloud
+
+# podman container stop mariadb
+# podman container rm mariadb
