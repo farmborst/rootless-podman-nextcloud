@@ -7,7 +7,7 @@ PODNAME=nextcloudpod
 podman pod stop $PODNAME && podman pod rm $PODNAME
 
 ## remove config volumes stored at ~/.local/share/containers/storage/volumes/
-podman volume rm ncv_nc ncv_mariadb ncv_redis
+podman volume rm ncv_nc ncv_mariadb ncv_redis 
 
 ## remove data volume stored at /mnt/raid1/nextcloudstorage
 # podman volume rm ncv_data

@@ -64,23 +64,23 @@ podman container create \
    --label "io.containers.autoupdate=registry" \
    --restart "unless-stopped" \
    --env NEXTCLOUD_TRUSTED_DOMAINS="'$NEXTCLOUD_TRUSTED_DOMAINS'" \
-   --env MYSQL_DATABASE="'$MYSQL_DATABASE'" \
-   --env MYSQL_USER="'$MYSQL_USER'" \
-   --env MYSQL_PASSWORD="'$MYSQL_PASSWORD'" \
-   --env MYSQL_HOST="'$MYSQL_HOST'" \
-   --env NEXTCLOUD_ADMIN_USER="'$NEXTCLOUD_ADMIN_USER'" \
-   --env NEXTCLOUD_ADMIN_PASSWORD="'$NEXTCLOUD_ADMIN_PASSWORD'" \
-   --env NEXTCLOUD_DATA_DIR="'$NEXTCLOUD_DATA_DIR'" \
-   --env MAIL_FROM_ADDRESS="'$MAIL_FROM_ADDRESS'" \
-   --env MAIL_DOMAIN="'$MAIL_DOMAIN'" \
-   --env SMTP_HOST="'$SMTP_HOST'" \
-   --env SMTP_PORT="'$SMTP_PORT'" \
-   --env SMTP_AUTHTYPE="'$SMTP_AUTHTYPE'" \
-   --env SMTP_NAME="'$SMTP_NAME'" \
-   --env SMTP_PASSWORD="'$SMTP_PASSWORD'" \
-   --env REDIS_HOST="'$REDIS_HOST'" \
-   --env REDIS_HOST_PORT="'$REDIS_HOST_PORT'" \
-   --env REDIS_HOST_PASSWORD="'$REDIS_PASSWORD'" \
+   --env MYSQL_DATABASE=$MYSQL_DATABASE \
+   --env MYSQL_USER=$MYSQL_USER \
+   --env MYSQL_PASSWORD=$MYSQL_PASSWORD \
+   --env MYSQL_HOST=$MYSQL_HOST \
+   --env NEXTCLOUD_ADMIN_USER=$NEXTCLOUD_ADMIN_USER \
+   --env NEXTCLOUD_ADMIN_PASSWORD=$NEXTCLOUD_ADMIN_PASSWORD \
+   --env NEXTCLOUD_DATA_DIR=$NEXTCLOUD_DATA_DIR \
+   --env MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS \
+   --env MAIL_DOMAIN=$MAIL_DOMAIN \
+   --env SMTP_HOST=$SMTP_HOST \
+   --env SMTP_PORT=$SMTP_PORT \
+   --env SMTP_AUTHTYPE=$SMTP_AUTHTYPE \
+   --env SMTP_NAME=$SMTP_NAME \
+   --env SMTP_PASSWORD=$SMTP_PASSWORD \
+   --env REDIS_HOST=$REDIS_HOST \
+   --env REDIS_HOST_PORT=$REDIS_HOST_PORT \
+   --env REDIS_HOST_PASSWORD=$REDIS_PASSWORD \
    --volume ncv_nc:/var/www/html \
    --volume ncv_data:/data \
    docker.io/library/nextcloud:stable
@@ -93,10 +93,10 @@ podman container create \
    --name=$CONTAINER2 \
    --label "io.containers.autoupdate=registry" \
    --restart "unless-stopped" \
-   --env MARIADB_ALLOW_EMPTY_ROOT_PASSWORD="'$MARIADB_ALLOW_EMPTY_ROOT_PASSWORD'" \
-   --env MYSQL_DATABASE="'$MYSQL_DATABASE'" \
-   --env MYSQL_USER="'$MYSQL_USER'" \
-   --env MYSQL_PASSWORD="'$MYSQL_PASSWORD'" \
+   --env MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=$MARIADB_ALLOW_EMPTY_ROOT_PASSWORD \
+   --env MYSQL_DATABASE=$MYSQL_DATABASE \
+   --env MYSQL_USER=$MYSQL_USER \
+   --env MYSQL_PASSWORD=$MYSQL_PASSWORD \
    --volume ncv_mariadb:/var/lib/mysql \
    docker.io/library/mariadb:lts
 
