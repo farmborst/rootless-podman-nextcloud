@@ -82,7 +82,7 @@ podman container create \
    --env REDIS_HOST_PORT=$REDIS_HOST_PORT \
    --env REDIS_HOST_PASSWORD=$REDIS_PASSWORD \
    --volume ncv_nc:/var/www/html \
-   --volume ncv_data:/data \
+   --volume ncv_data:/var/www/data \
    docker.io/library/nextcloud:stable
 
 
