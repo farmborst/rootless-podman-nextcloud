@@ -24,6 +24,7 @@
     REDIS_PASSWORD=strongpassword
     ```
 4. setup rootless podman nextcloud pod with all required containers 
+    * check the file nextcloud_podman_setup for possible changes you may want to make, e.g., change the storage location of the data volume "ncv_data" to a dedicated disk or raid mount
     * setup nextcloud podman pod
     ```bash
     $ bash nextcloud_podman_setup
@@ -60,7 +61,7 @@
         ```bash
         $  podman unshare cat ~/.local/share/containers/storage/volumes/ncv_nc/_data/config/config.ph
         ```
-    * for getting rid of warning "Server has no maintenance window start time configured." append
+    * for getting rid of warning "Server has no maintenance window start time configured." configure maintenance time window from 3 until 7 AM by appending
         * 'maintenance_window_start' => 3,
     * for getting rid of warning "Your installation has no default phone region set." append (replace XX with your country code, e.g., CH)
         * 'default_phone_region' => 'XX',
