@@ -26,9 +26,10 @@ CONTAINER1='nextcloudcontainer'
 CONTAINER2='mariadbcontainer'
 CONTAINER3='rediscontainer'
 CONTAINER4='collaboracontainer'
-MARIADB_ALLOW_EMPTY_ROOT_PASSWORD='1'
-MYSQL_DATABASE='nextcloud'
-MYSQL_USER='ncuser'
+MARIADB_RANDOM_ROOT_PASSWORD='yes'
+MARIADB_ROOT_HOST='localhost'
+MARIADB_DATABASE='nextcloud'
+MARIADB_USER='ncuser'
 MYSQL_HOST='127.0.0.1:3306'
 NEXTCLOUD_ADMIN_USER='admin'
 NEXTCLOUD_DATA_DIR='/var/www/data'
@@ -63,10 +64,11 @@ podman container create \
    --name=$CONTAINER2 \
    --label "io.containers.autoupdate=registry" \
    --restart "unless-stopped" \
-   --env MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=$MARIADB_ALLOW_EMPTY_ROOT_PASSWORD \
-   --env MYSQL_DATABASE=$MYSQL_DATABASE \
-   --env MYSQL_USER=$MYSQL_USER \
-   --env MYSQL_PASSWORD=$MYSQL_PASSWORD \
+   --env MARIADB_RANDOM_ROOT_PASSWORD=$MARIADB_RANDOM_ROOT_PASSWORD \
+   --env MARIADB_ROOT_HOST=$MARIADB_ROOT_HOST \
+   --env MARIADB_DATABASE=$MARIADB_DATABASE \
+   --env MARIADB_USER=$MARIADB_USER \
+   --env MARIADB_PASSWORD=$MARIADB_PASSWORD \
    --volume ncv_mariadb:/var/lib/mysql \
    docker.io/library/mariadb:lts
 
