@@ -127,6 +127,7 @@ podman container create \
    --env REDIS_HOST_PASSWORD=$REDIS_PASSWORD \
    --volume ncv_nc:/var/www/html \
    --volume ncv_data:$NEXTCLOUD_DATA_DIR \
+   --entrypoint='["bash", "-c", "/usr/bin/sleep 5 && /entrypoint.sh apache2-foreground"]' \
    docker.io/library/nextcloud:stable
 
 
