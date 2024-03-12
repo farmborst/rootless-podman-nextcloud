@@ -2,18 +2,19 @@
 [![License][license]](LICENSE)
 
 ## Setup Procedure
- * make sure your system fulfils the general prerequisites for a rootless podman setup (see below)
- * clone this git repository
+ 1. make sure your system fulfils the general prerequisites for a rootless podman setup (see below)
+ 2. clone this git repository
     ```bash
     $ git clone https://github.com/farmborst/rootless-podman-nextcloud.git
     ```
- * create and customize secrets file for defining passwords and sensitive data inside cloned git dir
+ 3. create and customize secrets file for defining passwords and sensitive data inside cloned git dir
     ```bash
     NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"' # IPs or domains you will be using to access nc
     MAIL_FROM_ADDRESS=somegmail.cron                   # mail address nc will use to inform you about stuff
     MAIL_DOMAIN=gmail.com                              # details for nc to send mails (example using gmail)
     SMTP_HOST=smtp.gmail.com                           # details for nc to send mails (example using gmail)
     SMTP_PORT=587                                      # details for nc to send mails (example using gmail)
+    SMTP_SECURE=ssl                                    # details for nc to send mails (example using gmail)
     SMTP_AUTHTYPE=1                                    # details for nc to send mails (example using gmail)
     SMTP_NAME=somegmail.cron@gmail.com                 # details for nc to send mails (example using gmail)
     SMTP_PASSWORD=tokenpassword                        # details for nc to send mails (example using gmail)
@@ -22,61 +23,44 @@
     COLLABORA_PASSWORD=strongpassword
     REDIS_PASSWORD=strongpassword
     ```
-* setup rootless podman nextcloud pod with all required containers
+4. setup rootless podman nextcloud pod with all required containers 
     * setup nextcloud podman pod
     ```bash
     $ bash nextcloud_podman_setup
     ```
-    * go to configure nextcloud IP or domain (NEXTCLOUD_TRUSTED_DOMAINS) with your preferred browser and test
-        * if everything works --> start systemd setup
-        * else 
-* setup systemd user unitfile for nextcloud pod
+    * **wait 1 minute and then** visit the configured nextcloud IP or domain (NEXTCLOUD_TRUSTED_DOMAINS) with your preferred browser
+    * login as admin and setup admin account email to enable receiving automatic mails from your nextcloud server
+        * if everything works --> continue with 5.
+        * else
+5. generate the systemd user unit files for the nextcloud pod and its containers and enable the service
     ```bash
     $ bash nextcloud_systemd_setup
     ```
-
-#### Get rid of warnings "Server has no maintenance window start time configured."
- * 'maintenance_window_start' => 3
- 
-#### Get rid of warning "Your installation has no default phone region set."
- * in the nextcloud directory open /config/config.php and append 'default_phone_region' => 'XX, e.g., XX=CH
-
-#### Configure automatic execution of nextcloud background jobs
-* for info on nextcloud Background Jobs see [nextcloud docs](https://docs.nextcloud.com/server/28/admin_manual/configuration_server/background_jobs_configuration.html)
-* create systemd user unit files at ~/.config/systemd/user for regularly executing nextcloud Background Jobs on the host user running the rootless nextcloud pod
-  * nextcloudcron.service
-    ```systemd
-    [Unit]
-    Description=Nextcloud cron.php job
-
-    [Service]
-    ExecCondition=podman  exec -t -u www-data NextcloudContainer php -f /var/www/html/occ status -e
-    ExecStart=podman  exec -t -u www-data NextcloudContainer php -f /var/www/html/cron.php
-    KillMode=process
-    ```
-  * nextcloudcron.timer
+6. generate the systemd user unit files on the host user (also running the rootless nextcloud pod) for regular and automatic execution of background jobs and enable the timer
     ```bash
-    [Unit]
-    Description=Run Nextcloud cron.php every 5 minutes
-
-    [Timer]
-    OnBootSec=5min
-    OnUnitActiveSec=5min
-    Unit=nextcloudcron.service
-
-    [Install]
-    WantedBy=timers.target
-    ```
-* enable and start the timer service
-    ```bash
+    # copy systemd user unit files to to target directory
+    $ cp nextcloudcron.service ~/.config/systemd/user
+    $ cp nextcloudcron.timer ~/.config/systemd/user
+    # reload systemd user daemon to let it find new unit files
+    $ systemctl --user daemon-reload
+    # start and enable systemd timer service for frequent execution of nextcloud background jobs
     $ systemctl --user enable --now nextcloudcron.timer
     ```
-* according to [this](https://github.com/containers/podman/discussions/19426) you can ignore the error "conmon ... <error>: Unable to send container stderr message to parent Broken pipe" seen, when checking 
-    ```bash
-    $ systemctl --user status nextcloudcron.service
-    ```
+    * according to [here](https://github.com/containers/podman/discussions/19426) you can ignore the error "conmon ... <error>: Unable to send container stderr message to parent Broken pipe" seen, when checking 
+        ```bash
+        $ systemctl --user status nextcloudcron.service
+        ```
+7. fix some warnings (visible in administration settings overview when logged in as admin via browser) 
+    * open the main nextcloud config file, found in the nextcloud container
+        ```bash
+        $  podman unshare cat ~/.local/share/containers/storage/volumes/ncv_nc/_data/config/config.ph
+        ```
+    * for getting rid of warning "Server has no maintenance window start time configured." append
+        * 'maintenance_window_start' => 3,
+    * for getting rid of warning "Your installation has no default phone region set." append (replace XX with your country code, e.g., CH)
+        * 'default_phone_region' => 'XX',
 
-## update
+## Updates
 * auto-updating the containers requires --label "io.containers.autoupdate=registry" when creating the containers and is then as easy as:
     ```bash
     $ podman auto-update

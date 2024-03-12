@@ -1,0 +1,7 @@
+[Unit]
+Description=Nextcloud cron.php job
+
+[Service]
+ExecCondition=podman  exec -t -u www-data nextcloudcontainer php -f /var/www/html/occ status -e
+ExecStart=podman  exec -t -u www-data nextcloudcontainer php -f /var/www/html/cron.php
+KillMode=process
