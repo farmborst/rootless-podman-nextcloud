@@ -31,7 +31,7 @@ MYSQL_DATABASE='nextcloud'
 MYSQL_USER='ncuser'
 MYSQL_HOST='127.0.0.1:3306'
 NEXTCLOUD_ADMIN_USER='admin'
-NEXTCLOUD_DATA_DIR='/data'
+NEXTCLOUD_DATA_DIR='/var/www/data'
 REDIS_HOST='localhost'
 REDIS_HOST_PORT='7777'
 COLLABORA_USER='ncuser'
@@ -82,7 +82,7 @@ podman container create \
    --env REDIS_HOST_PORT=$REDIS_HOST_PORT \
    --env REDIS_HOST_PASSWORD=$REDIS_PASSWORD \
    --volume ncv_nc:/var/www/html \
-   --volume ncv_data:/var/www/data \
+   --volume ncv_data:$NEXTCLOUD_DATA_DIR \
    docker.io/library/nextcloud:stable
 
 
