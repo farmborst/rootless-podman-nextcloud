@@ -104,10 +104,10 @@ podman container create \
 podman container create \
    --pod $PODNAME \
    --name=$CONTAINER1 \
-   --requires $CONTAINER2 $CONTAINER3\
+   --requires $CONTAINER2,$CONTAINER3 \
    --label "io.containers.autoupdate=registry" \
    --restart "unless-stopped" \
-   --env NEXTCLOUD_TRUSTED_DOMAINS=$NEXTCLOUD_TRUSTED_DOMAINS \
+   --env NEXTCLOUD_TRUSTED_DOMAINS="$NEXTCLOUD_TRUSTED_DOMAINS" \
    --env MYSQL_DATABASE=$MYSQL_DATABASE \
    --env MYSQL_USER=$MYSQL_USER \
    --env MYSQL_PASSWORD=$MYSQL_PASSWORD \
