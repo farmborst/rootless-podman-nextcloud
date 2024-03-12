@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# bash script for setting up nextcloud pod with all required services as nested containers
+# security is not configured for direct web exposure but should be suitable for the intended scenario with access limited to private lan / vpn
+
+
+## source passwords and sensitive data from gitignored secrets file 
+## either create own file secrets with commented variables listed below or uncomment and change here
+# NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"' # IPs or domains you will be using to access nc
+# MAIL_FROM_ADDRESS=somegmail.cron                   # mail adress nc will use to inform you about stuff
+# MAIL_DOMAIN=gmail.com                              # details for nc to use your mail (example for using gmail)
+# SMTP_HOST=smtp.gmail.com                           # details for nc to use your mail (example for using gmail)
+# SMTP_PORT=587                                      # details for nc to use your mail (example for using gmail)
+# SMTP_AUTHTYPE=1                                    # details for nc to use your mail (example for using gmail)
+# SMTP_NAME=somegmail.cron@gmail.com                 # details for nc to use your mail (example for using gmail)
+# SMTP_PASSWORD=tokenpassword                        # details for nc to use your mail (example for using gmail)
+# MYSQL_PASSWORD=strongpassword
+# NEXTCLOUD_ADMIN_PASSWORD=strongpassword
+# COLLABORA_PASSWORD=strongpassword
+# REDIS_PASSWORD=strongpassword
+. ./secrets
+
+
+# define more variables for this script (user input optional and generally not required)
+PODNAME='nextcloudpod'
+CONTAINER1='nextcloudcontainer'
+CONTAINER2='mariadbcontainer'
+CONTAINER3='rediscontainer'
+CONTAINER4='collaboracontainer'
+MARIADB_ALLOW_EMPTY_ROOT_PASSWORD='1'
+MYSQL_DATABASE='nextcloud'
+MYSQL_USER='ncuser'
+MYSQL_HOST='127.0.0.1:3306'
+NEXTCLOUD_ADMIN_USER='admin'
+NEXTCLOUD_DATA_DIR='/data'
+REDIS_HOST='localhost'
+REDIS_HOST_PORT='7777'
+COLLABORA_USER='ncuser'
+
+
+# prepare config volumes stored at ~/.local/share/containers/storage/volumes/
+podman volume create ncv_nc
+podman volume create ncv_mariadb
+podman volume create ncv_redis
+podman volume create ncv_data
+
+
+# prepare data volume stored at /mnt/raid1/nextcloudstorage
+# podman volume create -o device=/mnt/raid1/nextcloudstorage/ -o=o=bind ncv_data
+
+
+## create pod
+hash_pod=$(podman pod create \
+   --name=$PODNAME \
+   --publish 8080:80    `# publish nextcloud container http port` \
+   --publish 9980:9980  `# publish collabora container port` \
+   --restart "unless-stopped")
+
+
+## create container nr. 1 as child of pod
+# nextcloud, see also  and https://hub.docker.com/_/nextcloud/tags
+podman container create \
+   --pod $PODNAME \
+   --name=$CONTAINER1 \
+   --label "io.containers.autoupdate=registry" \
+   --restart "unless-stopped" \
+   --env NEXTCLOUD_TRUSTED_DOMAINS="'$NEXTCLOUD_TRUSTED_DOMAINS'" \
+   --env MYSQL_DATABASE="'$MYSQL_DATABASE'" \
+   --env MYSQL_USER="'$MYSQL_USER'" \
+   --env MYSQL_PASSWORD="'$MYSQL_PASSWORD'" \
+   --env MYSQL_HOST="'$MYSQL_HOST'" \
+   --env NEXTCLOUD_ADMIN_USER="'$NEXTCLOUD_ADMIN_USER'" \
+   --env NEXTCLOUD_ADMIN_PASSWORD="'$NEXTCLOUD_ADMIN_PASSWORD'" \
+   --env NEXTCLOUD_DATA_DIR="'$NEXTCLOUD_DATA_DIR'" \
+   --env MAIL_FROM_ADDRESS="'$MAIL_FROM_ADDRESS'" \
+   --env MAIL_DOMAIN="'$MAIL_DOMAIN'" \
+   --env SMTP_HOST="'$SMTP_HOST'" \
+   --env SMTP_PORT="'$SMTP_PORT'" \
+   --env SMTP_AUTHTYPE="'$SMTP_AUTHTYPE'" \
+   --env SMTP_NAME="'$SMTP_NAME'" \
+   --env SMTP_PASSWORD="'$SMTP_PASSWORD'" \
+   --env REDIS_HOST="'$REDIS_HOST'" \
+   --env REDIS_HOST_PORT="'$REDIS_HOST_PORT'" \
+   --env REDIS_HOST_PASSWORD="'$REDIS_PASSWORD'" \
+   --volume ncv_nc:/var/www/html \
+   --volume ncv_data:/data \
+   docker.io/library/nextcloud:stable
+
+
+## create container nr. 2 as child of pod
+# mariadb, see also https://mariadb.com/kb/en/release-notes/ and https://hub.docker.com/_/mariadb/tags
+podman container create \
+   --pod $PODNAME \
+   --name=$CONTAINER2 \
+   --label "io.containers.autoupdate=registry" \
+   --restart "unless-stopped" \
+   --env MARIADB_ALLOW_EMPTY_ROOT_PASSWORD="'$MARIADB_ALLOW_EMPTY_ROOT_PASSWORD'" \
+   --env MYSQL_DATABASE="'$MYSQL_DATABASE'" \
+   --env MYSQL_USER="'$MYSQL_USER'" \
+   --env MYSQL_PASSWORD="'$MYSQL_PASSWORD'" \
+   --volume ncv_mariadb:/var/lib/mysql \
+   docker.io/library/mariadb:lts
+
+
+## create container nr. 3 as child of pod
+# redis, see also https://hub.docker.com/_/redis and https://hub.docker.com/_/redis/tags
+podman container create \
+   --pod $PODNAME \
+   --name=$CONTAINER3 \
+   --label "io.containers.autoupdate=registry" \
+   --restart "unless-stopped" \
+   --entrypoint='["redis-server", "--port", "'$REDIS_HOST_PORT'", "--requirepass", "'$REDIS_PASSWORD'"]' \
+   --volume ncv_redis:/data \
+   docker.io/library/redis:latest
+
+
+## create container nr. 4 as child of pod
+# collabora, see also https://sdk.collaboraonline.com/docs/installation/CODE_Docker_image.html and https://hub.docker.com/r/collabora/code/tags
+# hash_container4=$(podman container create \
+#    --pod $PODNAME \
+#    --name=$CONTAINER4 \
+#    --label "io.containers.autoupdate=registry" \
+#    --restart "unless-stopped" \
+#    --env extra_params="--o:security.seccomp=false --o:ssl.enable=false --o:ssl.termination=true" \
+#    --env dictionaries="de_DE en_GB en_US" \
+#    --env aliasgroup1=http://192.168.1.2:8080 \
+#    --env aliasgroup2=http://10.0.0.2:8080 \
+#    --env username=$COLLABORA_USER \
+#    --env password=$COLLABORA_PASSWORD \
+#    docker.io/collabora/code:latest)
+
+
+podman pod start $PODNAME

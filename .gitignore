@@ -1,0 +1,3 @@
+# ignore secrets file with passwords and sensitive data
+secrets
+config.php

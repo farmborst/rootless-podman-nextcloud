@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# bash script for setting up nextcloud pod with all required services as nested containers as systemd service
+
+PODNAME=nextcloudpod
+# Change directory to the location for user unit files for systemd user services
+cd ~/.config/systemd/user
+# Generate systemd unit files for the pod
+podman generate systemd --files --new --name $PODNAME
+#  reload systemd user daemon to let it find new unit files
+systemctl --user daemon-reload
+# start service
+systemctl --user start pod-$PODNAME.service

@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-# collection of commands useful for full or partial reinstall / uninstall
+## collection of commands useful for full or partial reinstall / uninstall
 
-# podman volume rm ncapp
-# podman volume rm ncdb
-# podman volume rm ncdata
+PODNAME=nextcloudpod
 
-# podman pod stop PodNextcloud
-# podman pod rm PodNextcloud
+## stop and remove pod, hence also stopping and removing nested containers
+podman pod stop $PODNAME && podman pod rm $PODNAME
 
-# podman container stop nextcloud
-# podman container rm nextcloud
+## remove config volumes stored at ~/.local/share/containers/storage/volumes/
+podman volume rm ncv_nc ncv_mariadb ncv_redis
 
-# podman container stop mariadb
-# podman container rm mariadb
+## remove data volume stored at /mnt/raid1/nextcloudstorage
+# podman volume rm ncv_data
