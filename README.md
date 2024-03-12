@@ -31,7 +31,12 @@
     * **wait 1 minute and then** visit the configured nextcloud IP or domain (NEXTCLOUD_TRUSTED_DOMAINS) with your preferred browser
     * login as admin and setup admin account email to enable receiving automatic mails from your nextcloud server
         * if everything works --> continue with 5.
-        * else
+        * else start over
+            * stop and remove pod, containers and volumes
+                ```bash
+                $ bash nextcloud_podman_remove
+                ```
+            * check 1. and restart with 3. --> check prerequisites and update configs (i.e. secrets file) to suite your needs
 5. generate the systemd user unit files for the nextcloud pod and its containers and enable the service
     ```bash
     $ bash nextcloud_systemd_setup
