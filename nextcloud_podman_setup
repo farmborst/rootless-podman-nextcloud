@@ -120,6 +120,7 @@ podman container create \
    --env SMTP_HOST=$SMTP_HOST \
    --env SMTP_PORT=$SMTP_PORT \
    --env SMTP_AUTHTYPE=$SMTP_AUTHTYPE \
+   --env SMTP_SECURE=$SMTP_SECURE \
    --env SMTP_NAME=$SMTP_NAME \
    --env SMTP_PASSWORD=$SMTP_PASSWORD \
    --env REDIS_HOST=$REDIS_HOST \
