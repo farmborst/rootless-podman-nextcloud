@@ -8,5 +8,5 @@ cd ~/.config/systemd/user
 podman generate systemd --files --new --name $PODNAME
 #  reload systemd user daemon to let it find new unit files
 systemctl --user daemon-reload
-# start service
-systemctl --user start pod-$PODNAME.service
+# start and enable service
+systemctl --user enable --now pod-$PODNAME.service
