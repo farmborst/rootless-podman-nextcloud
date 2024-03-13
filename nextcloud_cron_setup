@@ -2,8 +2,8 @@
 # bash script for setting up nextcloud pod with all required services as nested containers as systemd service
 
 # copy systemd user unit files to target directory
-$ cp nextcloudcron.service ~/.config/systemd/user
-$ cp nextcloudcron.timer ~/.config/systemd/user
+cp nextcloudcron.service ~/.config/systemd/user
+cp nextcloudcron.timer ~/.config/systemd/user
 #  reload systemd user daemon to let it find new unit files
 systemctl --user daemon-reload
 # start and enable systemd timer service for frequent execution of nextcloud background jobs
