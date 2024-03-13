@@ -56,8 +56,8 @@ podman volume create ncv_redis
 podman volume create ncv_data
 
 
-# prepare data volume stored at /mnt/raid1/nextcloudstorage
-# podman volume create -o device=/mnt/raid1/nextcloudstorage/ -o=o=bind ncv_data
+# prepare data volume stored at /mnt/raid1/nextcloudvolume_data
+# podman volume create -o device=/mnt/raid1/nextcloudvolume_data/ -o=o=bind ncv_data
 
 
 ## create pod
