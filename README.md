@@ -9,19 +9,19 @@
     ```
  3. create and customize secrets file for defining passwords and sensitive data inside cloned git dir
     ```bash
-    NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"' # IPs or domains you will be using to access nc
-    MAIL_FROM_ADDRESS=somegmail.cron                   # mail address nc will use to inform you about stuff
-    MAIL_DOMAIN=gmail.com                              # details for nc to send mails (example using gmail)
-    SMTP_HOST=smtp.gmail.com                           # details for nc to send mails (example using gmail)
-    SMTP_PORT=587                                      # details for nc to send mails (example using gmail)
-    SMTP_SECURE=ssl                                    # details for nc to send mails (example using gmail)
-    SMTP_AUTHTYPE=1                                    # details for nc to send mails (example using gmail)
-    SMTP_NAME=somegmail.cron@gmail.com                 # details for nc to send mails (example using gmail)
-    SMTP_PASSWORD=tokenpassword                        # details for nc to send mails (example using gmail)
-    MYSQL_PASSWORD=strongpassword
-    NEXTCLOUD_ADMIN_PASSWORD=strongpassword
-    COLLABORA_PASSWORD=strongpassword
-    REDIS_PASSWORD=strongpassword
+    NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"'  # IPs or domains you will be using to access nc
+    MAIL_FROM_ADDRESS='somegmail.cron'                  # mail adress nc will use to inform you about stuff
+    MAIL_DOMAIN='gmail.com'                             # details for nc to use your mail (example for using gmail)
+    SMTP_HOST='smtp.gmail.com'                          # details for nc to use your mail (example for using gmail)
+    SMTP_PORT='587'                                     # details for nc to use your mail (example for using gmail)
+    SMTP_SECURE='tls'                                   # details for nc to use your mail (example for using gmail)
+    SMTP_NAME='somegmail.cron@gmail.com'                # details for nc to use your mail (example for using gmail)
+    SMTP_PASSWORD='tokenpassword'                       # details for nc to use your mail (example for using gmail)
+    MYSQL_PASSWORD='strongpassword'
+    MYSQL_ROOT_PASSWORD='strongpassword'
+    NEXTCLOUD_ADMIN_PASSWORD='strongpassword'
+    COLLABORA_PASSWORD='strongpassword'
+    REDIS_PASSWORD='strongpassword'
     ```
 4. setup rootless podman nextcloud pod with all required containers 
     * check the file nextcloud_podman_setup for possible changes you may want to make, e.g., change the storage location of the data volume "ncv_data" to a dedicated disk or raid mount
@@ -56,15 +56,6 @@
         ```bash
         $ systemctl --user status nextcloudcron.service
         ```
-7. fix some warnings (visible in administration settings overview when logged in as admin via browser) 
-    * open the main nextcloud config file, found in the nextcloud container
-        ```bash
-        $  podman unshare cat ~/.local/share/containers/storage/volumes/ncv_nc/_data/config/config.ph
-        ```
-    * for getting rid of warning "Server has no maintenance window start time configured." configure maintenance time window from 3 until 7 AM by appending
-        * 'maintenance_window_start' => 3,
-    * for getting rid of warning "Your installation has no default phone region set." append (replace XX with your country code, e.g., CH)
-        * 'default_phone_region' => 'XX',
 
 ## Updates
 * auto-updating the containers requires --label "io.containers.autoupdate=registry" when creating the containers and is then as easy as:

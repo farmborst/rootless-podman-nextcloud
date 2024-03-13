@@ -5,19 +5,19 @@
 
 ## source passwords and sensitive data from gitignored secrets file 
 ## either create own file secrets with commented variables listed below or uncomment and change here
-# NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"' # IPs or domains you will be using to access nc
-# MAIL_FROM_ADDRESS=somegmail.cron                   # mail adress nc will use to inform you about stuff
-# MAIL_DOMAIN=gmail.com                              # details for nc to use your mail (example for using gmail)
-# SMTP_HOST=smtp.gmail.com                           # details for nc to use your mail (example for using gmail)
-# SMTP_PORT=587                                      # details for nc to use your mail (example for using gmail)
-# SMTP_SECURE='tls'                                  # details for nc to use your mail (example for using gmail)
-# SMTP_NAME=somegmail.cron@gmail.com                 # details for nc to use your mail (example for using gmail)
-# SMTP_PASSWORD=tokenpassword                        # details for nc to use your mail (example for using gmail)
-# MYSQL_PASSWORD=strongpassword
-# MYSQL_ROOT_PASSWORD=strongpassword
-# NEXTCLOUD_ADMIN_PASSWORD=strongpassword
-# COLLABORA_PASSWORD=strongpassword
-# REDIS_PASSWORD=strongpassword
+# NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"'  # IPs or domains you will be using to access nc
+# MAIL_FROM_ADDRESS='somegmail.cron'                  # mail adress nc will use to inform you about stuff
+# MAIL_DOMAIN='gmail.com'                             # details for nc to use your mail (example for using gmail)
+# SMTP_HOST='smtp.gmail.com'                          # details for nc to use your mail (example for using gmail)
+# SMTP_PORT='587'                                     # details for nc to use your mail (example for using gmail)
+# SMTP_SECURE='tls'                                   # details for nc to use your mail (example for using gmail)
+# SMTP_NAME='somegmail.cron@gmail.com'                # details for nc to use your mail (example for using gmail)
+# SMTP_PASSWORD='tokenpassword'                       # details for nc to use your mail (example for using gmail)
+# MYSQL_PASSWORD='strongpassword'
+# MYSQL_ROOT_PASSWORD='strongpassword'
+# NEXTCLOUD_ADMIN_PASSWORD='strongpassword'
+# COLLABORA_PASSWORD='strongpassword'
+# REDIS_PASSWORD='strongpassword'
 . ./secrets
 
 
@@ -137,10 +137,20 @@ podman container create \
 
 podman pod start $PODNAME
 
-sleep 60
+echo "... waiting for initialization"
+sleep 30
+echo "..."
+sleep 30
+echo "... adding some configuration"
 
 ## add some configuration for the nextcloud container that are unfortunately not available via env (these changes are permanent since they are written the mounted volume ncv_nc at ~/.local/share/containers/storage/volumes/ncv_nc/_data/config/config.php)
 # set phone region
 podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set default_phone_region --value 'CH'
 # set start time for the 4 hour maintenance window
 podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set maintenance_window_start --value 3
+# setup logging to file
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set log_type --value 'file'
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set logfile --value 'nextcloud.log'
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set loglevel --value 2
+
+echo "... finished, log in as admin using your browser at '$NEXTCLOUD_TRUSTED_DOMAINS'"
