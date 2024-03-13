@@ -3,10 +3,12 @@
 
 ## Setup Procedure
  1. make sure your system fulfils the general prerequisites for a rootless podman setup (see below)
+
  2. clone this git repository
     ```bash
     $ git clone https://github.com/farmborst/rootless-podman-nextcloud.git
     ```
+
  3. create and customize secrets file for defining passwords and sensitive data inside cloned git dir
     ```bash
     NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"'  # IPs or domains you will be using to access nc
@@ -24,6 +26,7 @@
     REDIS_PASSWORD='strongpassword'
     adminuser_mail='your@mail.com'                      # mail address for receiving mails from your nextcloud server
     ```
+
 4. setup rootless podman nextcloud pod with all required containers 
     * check the file nextcloud_podman_setup for possible changes you may want to make, e.g., change the storage location of the data volume "ncv_data" to a dedicated disk or raid mount
     * setup nextcloud podman pod
@@ -39,25 +42,21 @@
                 $ bash nextcloud_podman_remove
                 ```
             * check 1. and restart with 3. --> check prerequisites and update configs (i.e. secrets file) to suite your needs
+
 5. generate the systemd user unit files for the nextcloud pod and its containers and enable the service
     ```bash
     $ bash nextcloud_systemd_setup
     ```
+
 6. generate the systemd user unit files on the host user (also running the rootless nextcloud pod) for regular and automatic execution of background jobs and enable the timer
     ```bash
-    # copy systemd user unit files to to target directory
-    $ cp nextcloudcron.service ~/.config/systemd/user
-    $ cp nextcloudcron.timer ~/.config/systemd/user
-    # reload systemd user daemon to let it find new unit files
-    $ systemctl --user daemon-reload
-    # start and enable systemd timer service for frequent execution of nextcloud background jobs
-    $ systemctl --user enable --now nextcloudcron.timer
+    $ bash nextcloud_cron_setup
     ```
     * according to [here](https://github.com/containers/podman/discussions/19426) you can ignore the error "conmon ... <error>: Unable to send container stderr message to parent Broken pipe" seen, when checking 
         ```bash
         $ systemctl --user status nextcloudcron.service
         ```
-
+    
 ## Updates
 * auto-updating the containers requires --label "io.containers.autoupdate=registry" when creating the containers and running systemd service for nextcloud (5. in Setup Procedure) and is then as easy as:
     ```bash
