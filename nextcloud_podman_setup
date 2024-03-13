@@ -3,7 +3,7 @@
 # security is not configured for direct web exposure but should be suitable for the intended scenario with access limited to private lan / vpn
 
 
-## source passwords and sensitive data from gitignored secrets file 
+## see https://hub.docker.com/_/nextcloud for info on auto configuration via environment variables
 ## create file secrets with commented variables listed below
 # NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"'  # IPs or domains you will be using to access nc
 # MAIL_FROM_ADDRESS='somegmail.cron'                  # mail adress nc will use to inform you about stuff
@@ -19,6 +19,9 @@
 # COLLABORA_PASSWORD='strongpassword'
 # REDIS_PASSWORD='strongpassword'
 # adminuser_mail='yourmail@receivemailsfromnextcloudserver'
+
+
+## source passwords and sensitive data from gitignored secrets file 
 . ./secrets
 
 
