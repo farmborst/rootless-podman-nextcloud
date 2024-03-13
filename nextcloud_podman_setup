@@ -4,7 +4,7 @@
 
 
 ## source passwords and sensitive data from gitignored secrets file 
-## either create own file secrets with commented variables listed below or uncomment and change here
+## create file secrets with commented variables listed below
 # NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"'  # IPs or domains you will be using to access nc
 # MAIL_FROM_ADDRESS='somegmail.cron'                  # mail adress nc will use to inform you about stuff
 # MAIL_DOMAIN='gmail.com'                             # details for nc to use your mail (example for using gmail)

@@ -10,7 +10,7 @@
  3. create and customize secrets file for defining passwords and sensitive data inside cloned git dir
     ```bash
     NEXTCLOUD_TRUSTED_DOMAINS='"10.8.0.2 192.168.1.2"'  # IPs or domains you will be using to access nc
-    MAIL_FROM_ADDRESS='somegmail.cron'                  # mail adress nc will use to inform you about stuff
+    MAIL_FROM_ADDRESS='somegmail.cron'                  # mail address nc will use to inform you about stuff
     MAIL_DOMAIN='gmail.com'                             # details for nc to use your mail (example for using gmail)
     SMTP_HOST='smtp.gmail.com'                          # details for nc to use your mail (example for using gmail)
     SMTP_PORT='587'                                     # details for nc to use your mail (example for using gmail)
@@ -22,6 +22,7 @@
     NEXTCLOUD_ADMIN_PASSWORD='strongpassword'
     COLLABORA_PASSWORD='strongpassword'
     REDIS_PASSWORD='strongpassword'
+    adminuser_mail='your@mail.com'                      # mail address for receiving mails from your nextcloud server
     ```
 4. setup rootless podman nextcloud pod with all required containers 
     * check the file nextcloud_podman_setup for possible changes you may want to make, e.g., change the storage location of the data volume "ncv_data" to a dedicated disk or raid mount
@@ -29,8 +30,8 @@
     ```bash
     $ bash nextcloud_podman_setup
     ```
-    * **wait 1 minute and then** visit the configured nextcloud IP or domain (NEXTCLOUD_TRUSTED_DOMAINS) with your preferred browser
-    * login as admin and setup admin account email to enable receiving automatic mails from your nextcloud server
+    * visit the configured nextcloud IP:port or domain (NEXTCLOUD_TRUSTED_DOMAINS) with your preferred browser
+    * login as admin and setup your nextcloud server
         * if everything works --> continue with 5.
         * else start over
             * stop and remove pod, containers and volumes
@@ -58,7 +59,7 @@
         ```
 
 ## Updates
-* auto-updating the containers requires --label "io.containers.autoupdate=registry" when creating the containers and is then as easy as:
+* auto-updating the containers requires --label "io.containers.autoupdate=registry" when creating the containers and running systemd service for nextcloud (5. in Setup Procedure) and is then as easy as:
     ```bash
     $ podman auto-update
     ```
