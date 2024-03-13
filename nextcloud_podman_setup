@@ -18,16 +18,23 @@
 # NEXTCLOUD_ADMIN_PASSWORD='strongpassword'
 # COLLABORA_PASSWORD='strongpassword'
 # REDIS_PASSWORD='strongpassword'
+# adminuser_mail='yourmail@receivemailsfromnextcloudserver'
 . ./secrets
 
 
-# define more variables for this script (user input optional and generally not required)
+## define more variables for this script (user input optional and generally not required)
+default_phone_region='CH'
+maintenance_window_start=3
+log_type='file'
+logfile='nextcloud.log'
+loglevel=0
+logdateformat="Y-m-d H:i:s"
+
 PODNAME='nextcloudpod'
 CONTAINER1='nextcloudcontainer'
 CONTAINER2='mariadbcontainer'
 CONTAINER3='rediscontainer'
 CONTAINER4='collaboracontainer'
-MYSQL_RANDOM_ROOT_PASSWORD='yes'
 MYSQL_ROOT_HOST='localhost'
 MYSQL_DATABASE='nextcloud'
 MYSQL_USER='ncuser'
@@ -137,20 +144,23 @@ podman container create \
 
 podman pod start $PODNAME
 
-echo "... waiting for initialization"
+echo "... waiting for initialization ..."
 sleep 30
 echo "..."
 sleep 30
-echo "... adding some configuration"
+echo "... adding some configuration ..."
 
 ## add some configuration for the nextcloud container that are unfortunately not available via env (these changes are permanent since they are written the mounted volume ncv_nc at ~/.local/share/containers/storage/volumes/ncv_nc/_data/config/config.php)
 # set phone region
-podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set default_phone_region --value 'CH'
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set default_phone_region --value $default_phone_region
 # set start time for the 4 hour maintenance window
-podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set maintenance_window_start --value 3
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set maintenance_window_start --value $maintenance_window_start
 # setup logging to file
-podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set log_type --value 'file'
-podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set logfile --value 'nextcloud.log'
-podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set loglevel --value 2
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set log_type --value $log_type
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set logfile --value $logfile
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set loglevel --value $loglevel
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set logdateformat --value $logdateformat
+# setup admin user email
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ user:setting admin settings email $adminuser_mail
 
-echo "... finished, log in as admin using your browser at '$NEXTCLOUD_TRUSTED_DOMAINS'"
+echo "... finished, log in as admin using your browser at '$NEXTCLOUD_TRUSTED_DOMAINS' on port 8080"
