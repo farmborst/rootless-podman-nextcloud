@@ -7,4 +7,4 @@ cp nextcloudcron.timer ~/.config/systemd/user
 #  reload systemd user daemon to let it find new unit files
 systemctl --user daemon-reload
 # start and enable systemd timer service for frequent execution of nextcloud background jobs
-systemctl --user enable --now pod-$PODNAME.service
+systemctl --user enable --now nextcloudcron.timer
