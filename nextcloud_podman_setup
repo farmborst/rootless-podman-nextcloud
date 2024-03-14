@@ -167,5 +167,7 @@ podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:s
 podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ user:setting admin settings email $adminuser_mail
 # setup background jobs scheduler to cron (correct for systemd service as foreseen in this setup)
 podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ background:cron
+# disable nextcloud example files for every user
+podman  exec -t -u www-data $CONTAINER1 php -f /var/www/html/occ config:system:set skeletondirectory --value ''
 
 echo "... finished, log in as admin using your browser at '$NEXTCLOUD_TRUSTED_DOMAINS' on port 8080"
